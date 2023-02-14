@@ -1,3 +1,4 @@
+#include <sstream>
 #include "sound.h"
 
 Sound::Sound(const char* file) {

@@ -1,11 +1,5 @@
 #pragma once
 
-#include <map>
-#include <array>
-#include <sstream>
-#pragma once
-
-#include <sstream>
 #include "openal.h"
 
 class Player {

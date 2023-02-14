@@ -1,6 +1,5 @@
 #pragma once
 
-#include <sstream>
 #include "ffmpeg.h"
 #include "openal.h"
 
