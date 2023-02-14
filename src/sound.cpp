@@ -21,10 +21,9 @@ Sound::Sound(const char* file) {
     codec_id  = ctx->streams[audio]->codecpar->codec_id;
     codec = avcodec_find_decoder(codec_id);
 
-    LOGI("Codec: %s", avcodec_get_name(codec_id))
-
     codec_ctx = Codec { avcodec_alloc_context3(codec), [] (AVCodecContext* ctx) { avcodec_close(ctx); avcodec_free_context(&ctx); }};
     CALL(avcodec_parameters_to_context(codec_ctx.get(), format->streams[audio]->codecpar))
+    LOGI("Codec: %s, Format %s", avcodec_get_name(codec_id), av_get_sample_fmt_name(codec_ctx->sample_fmt))
     CALL(avcodec_open2(codec_ctx.get(), codec, nullptr))
 
     CALL(swr_alloc_set_opts2(&swr_ctx, 
