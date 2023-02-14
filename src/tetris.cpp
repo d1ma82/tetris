@@ -84,9 +84,9 @@ void Tetris::create_mino(Type type, Orientation orientation, cv::Scalar color, i
             switch (orientation) {
                 case O1:
                     mino[0] = {type, O1, color, {pos_x, pos_y}};
-                    mino[1] = {type, O1, color, {pos_x+sz, pos_y}};             //            |
-                    mino[2] = {type, O1, color, {pos_x+2*sz, pos_y}};           //      ______|
-                    mino[3] = {type, O1, color, {pos_x+2*sz, pos_y-sz}};
+                    mino[1] = {type, O1, color, {pos_x, pos_y+sz}};             //            |
+                    mino[2] = {type, O1, color, {pos_x-sz, pos_y+sz}};          //      ______|
+                    mino[3] = {type, O1, color, {pos_x-2*sz, pos_y+sz}};
                     break;
                 case O2:
                     mino[0] = {type, O2, color, {pos_x, pos_y}};             
@@ -138,9 +138,9 @@ void Tetris::create_mino(Type type, Orientation orientation, cv::Scalar color, i
             switch (orientation) {
                 case O1:
                     mino[0] = {type, O1, color, {pos_x, pos_y}};
-                    mino[1] = {type, O1, color, {pos_x+sz, pos_y}};      
-                    mino[2] = {type, O1, color, {pos_x+2*sz, pos_y}};    //      __|__
-                    mino[3] = {type, O1, color, {pos_x+sz, pos_y-sz}};
+                    mino[1] = {type, O1, color, {pos_x-sz, pos_y+sz}};      
+                    mino[2] = {type, O1, color, {pos_x, pos_y+sz}};    //      __|__
+                    mino[3] = {type, O1, color, {pos_x+sz, pos_y+sz}};
                     break;
                 case O2:
                     mino[0] = {type, O2, color, {pos_x, pos_y}};
@@ -169,13 +169,13 @@ void Tetris::create_mino(Type type, Orientation orientation, cv::Scalar color, i
     }
 }
 
-void Tetris::create_mino() noexcept {
+uint32_t Tetris::create_mino() noexcept {
 
     // Проверить если текущего объекта не существует, тогда
     // Определить рандомно тип объекта
     // Определить рандомную позицию по горизонтали,
     // так чтоб вновь созданный объект не выходил за рамки.
-    if (current) return;
+    
     mino_id++;
    
     Type type           = (Type) gen_type();
@@ -186,8 +186,8 @@ void Tetris::create_mino() noexcept {
     std::array<Mino, 4> mino;
     create_mino(type, O1, color, pos_x, pos_y, mino);
     minos.emplace(mino_id, mino);
-    current = mino_id;
     LOGI("New mino type %d, pos %d size %d", type, pos_x, sz)
+    return mino_id;
 }
 
 bool Tetris::move_down() noexcept {
@@ -202,7 +202,7 @@ bool Tetris::move_down() noexcept {
 
         for (const auto& el: minos) {
 
-            if (current==el.first) continue;
+            if (current==el.first || next==el.first) continue;
 
             for (const auto& next: el.second)
                 if (next.enabled && cur_el.TL.y+sz > next.TL.y) {
@@ -230,7 +230,7 @@ void Tetris::move_left() noexcept {
 
         for (const auto& el: minos) {
 
-            if (current==el.first) continue;
+            if (current==el.first || next==el.first) continue;
 
             for (const auto& next: el.second)
                 if (next.enabled && cur_el.TL.x-sz < next.TL.x+sz) {
@@ -258,7 +258,7 @@ void Tetris::move_right() noexcept {
 
         for (const auto& el: minos) {
 
-            if (current==el.first) continue;
+            if (current==el.first || next==el.first) continue;
 
             for (const auto& next: el.second)
                 if (next.enabled && cur_el.TL.x+sz >= next.TL.x) {
@@ -283,7 +283,7 @@ bool Tetris::can_rotate(const std::array<Mino, 4>& mino) noexcept {
 
         for (const auto& el: minos) {
 
-            if (current==el.first) continue;
+            if (current==el.first || next==el.first) continue;
 
             for (const auto& next: el.second) {
 
@@ -399,7 +399,12 @@ void Tetris::apply() {
     
     char buf[256];
 
-    create_mino();
+    if (!current) {
+        
+        current = next==0? create_mino(): next;
+        next = create_mino();
+    }
+
     if (!game_over_flag && !move_down()) {
         
         previous = current;
@@ -429,7 +434,10 @@ void Tetris::apply() {
     for (auto& mino: minos)
         for (auto& el: mino.second)   
             if (el.enabled) cv::rectangle(img, cv::Rect(el.TL.x, el.TL.y, sz, sz), el.color, -1); 
-    
+
+    for (auto& el: minos[next])
+         cv::rectangle(img, cv::Rect(el.TL.x, el.TL.y, sz, sz), el.color, -1);
+
     snprintf(buf, 256, "Score: %d%c", score, '\0');
     cv::putText(img, buf, {0,30}, cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0,255,0));
 

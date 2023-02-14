@@ -28,13 +28,13 @@ private:
     uint32_t    score      {0};
     const dims& viewport;
     cv::Mat     img, zeros;
-    uint32_t    current {0}, previous {0};
+    uint32_t    current {0}, previous {0}, next {0};
     bool        game_over_flag {false};
     std::map<uint32_t, std::array<Mino, 4>> minos;
     Tetrislisteners listeners;
     // Создает новый предмет
     // если текущий предмет упал или не создан
-    void create_mino() noexcept;
+    uint32_t create_mino() noexcept;
     void create_mino(Type type, Orientation orientation, cv::Scalar color, int pos_x, int pos_y, std::array<Mino, 4>& mino) noexcept;
     // Возвращает номер линии, с наивысшей точкой
     uint32_t get_min_line();
