@@ -19,7 +19,7 @@ using listener = std::function<void(Type type)>;
 
 struct Tetrislisteners {
 
-    listener on_left, on_right, on_rotate, on_ground;
+    listener on_left, on_right, on_rotate, on_ground, on_delete;
 };
 
 class Tetris: public Filter {

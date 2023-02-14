@@ -15,7 +15,7 @@ static std::unique_ptr<Window> game_window;
 static std::unique_ptr<Render> render;
 static Tetris* tetris;
 static std::vector<Filter*> filters;
-static std::unique_ptr<Sound> snd_move, snd_ground;
+static std::unique_ptr<Sound> snd_move, snd_ground, snd_delete;
 static std::unique_ptr<Player> player;
 
 static void init() {
@@ -23,6 +23,7 @@ static void init() {
     player      = std::make_unique<Player>();
     snd_move    = std::make_unique<Sound>("../media/move.wav");
     snd_ground  = std::make_unique<Sound>("../media/ground.wav");
+    snd_delete  = std::make_unique<Sound>("../media/delete.wav");
 
     game_window = std::make_unique<Window>(dims{WIDTH, HEIGHT}, "Tetris");
     game_window->set_on_key_press_listener (
@@ -44,11 +45,13 @@ static void init() {
     game_window->set_on_draw_listener([] () { render->render(); });
 
     render = std::make_unique<Render>(dims{WIDTH, HEIGHT});
+
     Tetrislisteners list = {
         .on_left    = [] (Type) { player->play(snd_move->buf()); },
         .on_right   = [] (Type) { player->play(snd_move->buf()); },
         .on_rotate  = [] (Type) { player->play(snd_move->buf()); },
-        .on_ground  = [] (Type) { player->play(snd_ground->buf()); }
+        .on_ground  = [] (Type) { player->play(snd_ground->buf()); },
+        .on_delete  = [] (Type) { player->play(snd_delete->buf()); }
     };
 
     filters.push_back(new Tetris(dims{WIDTH, HEIGHT}, list));
@@ -68,7 +71,6 @@ static void loop() {
 
 static void clear() {
 
-    //player.reset(nullptr);
     render->wait_finish();
     for (auto f: filters) delete f;
     render.reset(nullptr);

@@ -407,11 +407,12 @@ void Tetris::apply() {
         uint32_t deleted = 0;
         delete_lines(SQ_PER_COL, deleted);
         game_over_flag = game_over();
-        listeners.on_ground(minos[previous][0].type);
-
+        Type type = minos[previous][0].type;
+        
         if (deleted>0) {        // опускаем верхние блоки 
 
             score += deleted;
+            listeners.on_delete(type);
 
             for (auto& itm: minos) {
 
@@ -419,8 +420,9 @@ void Tetris::apply() {
                 std::for_each(itm.second.begin(), itm.second.end(), [&] (const auto& item) { if (!item.enabled) cnt++; });
                 if (cnt==4) minos.erase(itm.first);
             }
+        } else {
+            listeners.on_ground(type);
         }
-        
     }
 
     zeros.copyTo(img);
