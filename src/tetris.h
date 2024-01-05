@@ -6,17 +6,14 @@
 #include "opengl.h"
 #include "types.h"
 #include "mino_factory.h"
-
-namespace tetris {
+#include "window.h"
 
 using event = std::function<void(int)>;
 
-struct Events {
+struct TetrisEventListener {
 
     event on_left, on_right, on_rotate, on_ground, on_delete, on_game_over, on_close;
 };
-
-}
 
 class Tetris: public Filter {
 private:
@@ -29,7 +26,8 @@ private:
     bool                    close_flag {false};
     Factory*                factory;
     std::map<int, Mino>     minos;
-    tetris::Events events;
+    TetrisEventListener     events;
+    KeyListener             listener;
 
     int create_mino();
     // Calc min y pos from the bottom, for current mino, and store in a class attrib
@@ -38,7 +36,7 @@ private:
     void game_over() { game_over_flag = min_y<=sz*2; }
     bool collision(const Brick& current_brick, const Brick& brick, bool left);
 public:
-    Tetris(dims viewport, tetris::Events list, Factory* factory);
+    Tetris(dims viewport, TetrisEventListener list, Factory* factory);
     
     bool move_down();
     void move_left();
@@ -46,5 +44,6 @@ public:
     void rotate();
     void close() { close_flag=true; events.on_close(0);}
     void apply(uint8_t* scene);
+    KeyListener* key_listener() { return &listener; }
     ~Tetris() {}
 };
