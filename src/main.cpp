@@ -14,6 +14,21 @@ static Tetris* game {nullptr};
 static std::vector<Filter*> filters;
 static DefaultFactory factory;
 
+void on_key(int key, int action) {
+
+    if (action == PRESS) {
+        switch(key) {
+            case KEY_LEFT:   game->move_left(); break;
+            case KEY_RIGHT:  game->move_right(); break;
+            case KEY_DOWN:   break;
+            case KEY_UP:     game->rotate(); break;
+            case KEY_ESCAPE: game->close(); break;
+        }
+    }    
+}
+
+static auto listener{on_key};
+
 static void init() {
 
     LOGI("Create window")
@@ -30,7 +45,7 @@ static void init() {
 
     game = new Tetris(dims{WIDTH, HEIGHT}, events, &factory);
     filters.push_back(game);
-    game_window->set_key_event_listener(game->key_listener());
+    game_window->set_key_event_listener(listener);
     game_window->attach_filters(filters);
 }
 

@@ -6,7 +6,6 @@
 #include "opengl.h"
 #include "types.h"
 #include "mino_factory.h"
-#include "window.h"
 
 using event = std::function<void(int)>;
 
@@ -27,7 +26,6 @@ private:
     Factory*                factory;
     std::map<int, Mino>     minos;
     TetrisEventListener     events;
-    KeyListener             listener;
 
     int create_mino();
     // Calc min y pos from the bottom, for current mino, and store in a class attrib
@@ -44,6 +42,5 @@ public:
     void rotate();
     void close() { close_flag=true; events.on_close(0);}
     void apply(uint8_t* scene);
-    KeyListener* key_listener() { return &listener; }
     ~Tetris() {}
 };

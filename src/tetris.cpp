@@ -10,26 +10,10 @@ static const int SQ_PER_LINE = 20;
 static int gen = 0;     // Mino id generator
 
 
-void on_key(void* context, int key, int action) {
-
-    if (!context) return;
-    Tetris* game = reinterpret_cast<Tetris*>(context);
-
-    if (action == PRESS) {
-        switch(key) {
-            case KEY_LEFT:   game->move_left(); break;
-            case KEY_RIGHT:  game->move_right(); break;
-            case KEY_DOWN:   break;
-            case KEY_UP:     game->rotate(); break;
-            case KEY_ESCAPE: game->close(); break;
-        }
-    }    
-}
-
 Tetris::Tetris(dims viewport, TetrisEventListener list, Factory* factory):
 
         viewport{viewport}, events{list}, 
-            factory{factory}, min_y{viewport.second}, listener{this, on_key} 
+            factory{factory}, min_y{viewport.second}
 {
     sz      = viewport.first/SQ_PER_LINE;
     LOGI("SQ Per Line %d Square size %d", SQ_PER_LINE, sz)

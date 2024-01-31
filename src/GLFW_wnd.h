@@ -9,7 +9,6 @@
 class GLFW: public Window {
 private:
     GLFWwindow* window {nullptr};
-    KeyListener* events {nullptr};
     Render* render;
 public:
     GLFW(dims size, const char* title);
@@ -17,6 +16,6 @@ public:
     void close() { glfwSetWindowShouldClose(window, 1); }
     void draw();
     void attach_filters(std::vector<Filter*> filters) { render->attach_filters(filters); }
-    void set_key_event_listener(KeyListener* events);
+    void set_key_event_listener(key_listener listener);
     ~GLFW();
 };

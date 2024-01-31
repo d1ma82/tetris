@@ -25,14 +25,12 @@ GLFW::GLFW(dims size, const char* title) {
     render = new Render(size);
 }
 
-void GLFW::set_key_event_listener(KeyListener* events) {
+void GLFW::set_key_event_listener(key_listener listener) {
     
-    this->events = events; 
-    static KeyListener* ev=this->events;            // Do not know better way to put events in lambda
+    static auto listener_=listener;            // Do not know better way to put events in lambda
 
     glfwSetKeyCallback(window, 
-            [] (GLFWwindow*, int key, int, int action, int) 
-                            { ev->on_key_press(ev->context, key, action); });
+            [] (GLFWwindow*, int key, int, int action, int) { listener_(key, action); });
 }
 
 void GLFW::draw() {
